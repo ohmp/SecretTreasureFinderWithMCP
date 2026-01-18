@@ -1,0 +1,5 @@
+smolagents[mcp]
+fastmcp
+gradio
+huggingface_hub
+python-dotenv
