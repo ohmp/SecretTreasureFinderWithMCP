@@ -25,11 +25,23 @@ jobs:
       - name: Install huggingface-hub CLI
         run: |
           pip install --upgrade pip
-          pip install huggingface-hub
+          pip install 'huggingface-hub[cli]'
 
       - name: Deploy to Hugging Face Spaces
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          python -m huggingface_hub.commands.huggingface_cli login --token $HF_TOKEN
-          python -m huggingface_hub.commands.huggingface_cli upload --repo-type space ohmp/SecrectDocumentLocker . --exclude ".env" ".venv/**" "__pycache__/**" "*.pyc" ".git/**" ".github/**"
+          python -c "
+          from huggingface_hub import HfApi, login
+          import os
+          
+          login(token=os.environ['HF_TOKEN'])
+          api = HfApi()
+          api.upload_folder(
+              folder_path='.',
+              repo_id='ohmp/SecrectDocumentLocker',
+              repo_type='space',
+              ignore_patterns=['.env', '.venv/**', '__pycache__/**', '*.pyc', '.git/**', '.github/**']
+          )
+          print('Deployment complete!')
+          "
